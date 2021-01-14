@@ -1,10 +1,8 @@
-PoBFrontend
-===========
+# PoBFrontend
 
 A cross-platform [Path of Building](https://github.com/Openarl/PathOfBuilding) driver.
 
-Building
---------
+## Building
 
 ### Dependencies:
 
@@ -25,21 +23,8 @@ Building
 
 You need to build [Lua-Curl](https://github.com/Lua-cURL/Lua-cURLv3) for luajit.
 
-Edit the Lua-Curl Makefile:
-
-```diff
-@@ -7,7 +7,7 @@ DESTDIR          ?= /
- PKG_CONFIG       ?= pkg-config
- INSTALL          ?= install
- RM               ?= rm
--LUA_IMPL         ?= lua
-+LUA_IMPL         ?= luajit
- CC               ?= $(MAC_ENV) gcc
- 
- LUA_VERSION       = $(shell $(PKG_CONFIG) --print-provides --silence-errors $(LUA_IMPL))
-```
- 
-Run make. You should get `lcurl.so`.
+1. Clone it from the Github repo above
+2. While in the root directory, Run `LUA_IMPL=luajit make`. You should get lcurl.so
 
 ### Get the PoBFrontend sources:
 
@@ -47,8 +32,11 @@ Run make. You should get `lcurl.so`.
 
 ### Build:
 
+First, change into this directory.
+
 ```bash
-meson -Dbuildtype=release pobfrontend build
+# Assuming you installed qt with Homebrew
+PKG_CONFIG_PATH="/usr/local/opt/qt/lib/pkgconfig" meson -Dbuildtype=release . build
 cd build
 ninja
 ```
@@ -80,7 +68,7 @@ I have the following edit in my PathOfBuilding clone, stops it from saving build
 +++ b/Modules/Build.lua
 @@ -599,7 +599,7 @@ function buildMode:CanExit(mode)
  end
- 
+
  function buildMode:Shutdown()
 -       if launch.devMode and self.targetVersion and not self.abortSave then
 +       if false then --launch.devMode and self.targetVersion and not self.abortSave then
@@ -96,5 +84,3 @@ On mac you need to invoke meson with some extra flags, per the luajit documentat
 ```bash
 LDFLAGS="-pagezero_size 10000 -image_base 100000000" meson pobfrontend build
 ```
-
-
