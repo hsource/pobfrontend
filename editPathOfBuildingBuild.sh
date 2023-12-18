@@ -19,6 +19,11 @@ sed -E -i '' "$SED_COMMAND" src/Modules/BuildSiteTools.lua
 # Do not remove SSL for LaunchInstall and Update as that's more sensitive, but
 # also unused.
 
+# Add nil check. Without it, we got an error on 2023-12-18:
+# "Error loading main script: Data/Uniques/Special/Generated.lua:239 attempt
+# to index local 'grantedEffect' (a nil value)
+sed -i '' 's/if grantedEffect.support/if grantedEffect ~= nil and grantedEffect.support/' src/Data/Uniques/Special/Generated.lua
+
 # Run remaining setup
 unzip runtime-win32.zip lua/xml.lua lua/base64.lua lua/sha1.lua
 mv lua/*.lua .
