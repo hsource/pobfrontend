@@ -14,11 +14,11 @@ curl_dep = dependency('libcurl')
 
 # Added flag based on https://stackoverflow.com/a/37729971/319066
 # and arguments based on https://mesonbuild.com/Adding-arguments.html
-compiler_arguments = ['-mmacosx-version-min=10.12', '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk']
+compiler_arguments = ['-mmacosx-version-min=10.12', '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk']
 add_project_arguments(compiler_arguments , language : 'c')
 add_project_arguments(compiler_arguments, language : 'cpp')
 
-linker_arguments = ['-mmacosx-version-min=10.12', '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk']
+linker_arguments = ['-mmacosx-version-min=10.12', '-isysroot', '/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk']
 add_project_link_arguments(linker_arguments, language : 'c')
 add_project_link_arguments(linker_arguments, language : 'cpp')
 
