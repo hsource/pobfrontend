@@ -49,11 +49,15 @@ luacurl:
 
 # curl is used since mesonInstaller.sh copies over the shared library dylib
 # dylibbundler is used to copy over dylibs that lcurl.so uses
+#
 # luautf8 is used at runtime; the version is picked to match the PathOfBuilding
 # version from https://github.com/PathOfBuildingCommunity/PathOfBuilding/blob/5eb8bd3bd2ad1b2ce0ee2f850e69b3197de8572c/Dockerfile#L35
+#
+# We install luautf8 locally to ensure it works even if we can't write to the
+# system, like in Github Actions.
 tools:
 	arch --x86_64 brew install qt@5 luajit zlib meson curl dylibbundler gcc@12 luarocks; \
-	luarocks install --local luautf8 0.1.6-1
+	luarocks install --local --lua-version 5.1 luautf8 0.1.6-1
 
 # We don't usually modify the PathOfBuilding directory, so there's rarely a
 # need to delete it. We separate it out to a separate task.
