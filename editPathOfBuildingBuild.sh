@@ -31,5 +31,6 @@ unzip runtime-win32.zip lua/xml.lua lua/base64.lua lua/sha1.lua
 mv lua/*.lua .
 rmdir lua
 cp ../lcurl.so .
+cp ~/.luarocks/lib/lua/5.1/lua-utf8.so .
 mv src/* .
 rmdir src
