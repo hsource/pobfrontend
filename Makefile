@@ -53,7 +53,7 @@ luacurl:
 # version from https://github.com/PathOfBuildingCommunity/PathOfBuilding/blob/5eb8bd3bd2ad1b2ce0ee2f850e69b3197de8572c/Dockerfile#L35
 tools:
 	arch --x86_64 brew install qt@5 luajit zlib meson curl dylibbundler gcc@12 luarocks; \
-	luarocks install luautf8 0.1.6-1
+	luarocks install --local luautf8 0.1.6-1
 
 # We don't usually modify the PathOfBuilding directory, so there's rarely a
 # need to delete it. We separate it out to a separate task.
