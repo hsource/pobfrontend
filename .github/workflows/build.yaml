@@ -33,3 +33,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           tag: v${{ steps.get-version.outputs.VERSION }}
+        if: github.ref == 'refs/heads/master'
