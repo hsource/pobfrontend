@@ -42,6 +42,9 @@ public:
 
         connect(&updateTimer, &QTimer::timeout, this, QOverload<>::of(&POBWindow::triggerUpdate));
         updateTimer.start(100);
+
+        // macOS: disable native fullscreen (causes OpenGL context crash); green button will zoom/maximize instead
+        setFlag(Qt::WindowFullscreenButtonHint, false);
     }
 
 //    POBWindow() : QOpenGLWindow() {

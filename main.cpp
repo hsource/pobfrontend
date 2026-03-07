@@ -17,6 +17,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#ifdef __APPLE__
+void disableNativeFullscreen(QWindow *window);
+#endif
+
 lua_State *L;
 
 int dscount;
@@ -806,6 +810,12 @@ DrawStringCmd::DrawStringCmd(float X, float Y, int Align, int Size, int Font, co
         case 2:
             fontName = "Liberation Sans Bold";
             break;
+        case 3: // FONTIN
+        case 4: // FONTIN ITALIC
+        case 5: // FONTIN SC
+        case 6: // FONTIN SC ITALIC
+            fontName = "Liberation Sans";
+            break;
         case 0:
         default:
             fontName = "Bitstream Vera Sans Mono";
@@ -882,7 +892,7 @@ static int l_DrawString(lua_State* L)
     pobwindow->LAssert(L, lua_isstring(L, 5), "DrawString() argument 5: expected string, got %t", 5);
     pobwindow->LAssert(L, lua_isstring(L, 6), "DrawString() argument 6: expected string, got %t", 6);
     static const char* alignMap[6] = { "LEFT", "CENTER", "RIGHT", "CENTER_X", "RIGHT_X", nullptr };
-    static const char* fontMap[4] = { "FIXED", "VAR", "VAR BOLD", nullptr };
+    static const char* fontMap[8] = { "FIXED", "VAR", "VAR BOLD", "FONTIN", "FONTIN ITALIC", "FONTIN SC", "FONTIN SC ITALIC", nullptr };
     pobwindow->AppendCmd(std::make_unique<DrawStringCmd>(
         (float)lua_tonumber(L, 1), (float)lua_tonumber(L, 2), luaL_checkoption(L, 3, "LEFT", alignMap), 
         (int)lua_tointeger(L, 4), luaL_checkoption(L, 5, "FIXED", fontMap), lua_tostring(L, 6)
@@ -906,6 +916,10 @@ static int l_DrawStringWidth(lua_State* L)
     } else if (fontName == "VAR BOLD") {
         fontName = "Liberation Sans Bold";
         fontKey = "2";
+    } else if (fontName == "FONTIN" || fontName == "FONTIN ITALIC" ||
+               fontName == "FONTIN SC" || fontName == "FONTIN SC ITALIC") {
+        fontName = "Liberation Sans";
+        fontKey = "3";
     } else {
         fontName = "Bitstream Vera Sans Mono";
     }
@@ -942,6 +956,9 @@ static int l_DrawStringCursorIndex(lua_State* L)
         fontName = "Liberation Sans";
     } else if (fontName == "VAR BOLD") {
         fontName = "Liberation Sans Bold";
+    } else if (fontName == "FONTIN" || fontName == "FONTIN ITALIC" ||
+               fontName == "FONTIN SC" || fontName == "FONTIN SC ITALIC") {
+        fontName = "Liberation Sans";
     } else {
         fontName = "Bitstream Vera Sans Mono";
     }
@@ -1633,6 +1650,13 @@ int main(int argc, char **argv)
     luaL_openlibs(L);
     luaJIT_setmode(L, 0, LUAJIT_MODE_ENGINE|LUAJIT_MODE_OFF);
 
+    // Store debug.traceback in registry so l_PCall's error handler works.
+    // Without this, "traceback" is nil and PCall errors cause LUA_ERRERR -> PANIC.
+    lua_getglobal(L, "debug");
+    lua_getfield(L, -1, "traceback");
+    lua_setfield(L, LUA_REGISTRYINDEX, "traceback");
+    lua_pop(L, 1); // pop debug table
+
     // Callbacks
     lua_newtable(L);		// Callbacks table
     lua_pushvalue(L, -1);	// Push callbacks table
@@ -1766,6 +1790,12 @@ int main(int argc, char **argv)
     }
     pobwindow->resize(800, 600);
     pobwindow->show();
+
+#ifdef __APPLE__
+    // Disable native fullscreen after the event loop has fully set up the NSWindow.
+    // Must NOT be called inside initializeGL() — winId() there disrupts the GL surface.
+    QTimer::singleShot(500, []() { disableNativeFullscreen(pobwindow); });
+#endif
 
     // Add the bundled fonts
     QFontDatabase::addApplicationFont(QDir::currentPath() + "/VeraMono.ttf");
